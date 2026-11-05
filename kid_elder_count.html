@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kid & Elder Count | 小朋友至老人都能懂</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* ==============================================================
+           CORE STYLING: SHARP, UNIFIED LIGHT GREEN TEXT & DUAL MODES
+           ============================================================== */
+        
+        body {
+            background-color: transparent !important;
+            font-family: 'Noto Sans TC', 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --------------------------------------------------------------
+           NIGHT MODE (DEFAULT): DARK GLASS CARDS & SOFT DARK CONTRAST SHADOW
+           -------------------------------------------------------------- */
+        body, body *, 
+        button, textarea, input, select {
+            color: #86efac !important; /* Permanent Light Green */
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+        }
+
+        .stat-num {
+            color: #4ade80 !important;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9) !important;
+        }
+
+        textarea::placeholder {
+            color: rgba(134, 239, 172, 0.7) !important;
+            text-shadow: 0 1px 2px #000000 !important;
+        }
+
+        .nz-card {
+            background-color: rgba(15, 23, 42, 0.72) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid rgba(74, 222, 128, 0.4) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .nz-card-hover:hover {
+            transform: translateY(-2px);
+            border-color: rgba(134, 239, 172, 0.7) !important;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75) !important;
+        }
+
+        textarea {
+            background-color: rgba(2, 12, 20, 0.82) !important;
+            border: 2.5px solid rgba(134, 239, 172, 0.5) !important;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        /* --------------------------------------------------------------
+           DAYTIME MODE (☀️ 白天高對比模式): 
+           WHITE CARDS + PERMANENT VIBRANT LIGHT GREEN TEXT + NO SHADOWS
+           -------------------------------------------------------------- */
+        body.day-mode, 
+        body.day-mode *, 
+        body.day-mode button, 
+        body.day-mode textarea, 
+        body.day-mode input, 
+        body.day-mode select {
+            color: #22c55e !important; /* Permanent Light Green in Day Mode */
+            text-shadow: none !important; /* Absolutely NO text blur/shadows */
+        }
+
+        body.day-mode .stat-num {
+            color: #4ade80 !important;
+            text-shadow: none !important;
+        }
+
+        body.day-mode textarea::placeholder {
+            color: rgba(34, 197, 94, 0.7) !important;
+            text-shadow: none !important;
+        }
+
+        /* Daytime White Cards: Clean, Flat, Semi-transparent White Background, NO BACKING SHADOWS */
+        body.day-mode .nz-card {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2.5px solid #22c55e !important;
+            box-shadow: none !important; /* ABSOLUTELY NO SHADOWS IN DAY MODE */
+        }
+
+        body.day-mode .nz-card-hover:hover {
+            background-color: rgba(255, 255, 255, 0.98) !important;
+            border-color: #4ade80 !important;
+            box-shadow: none !important;
+        }
+
+        body.day-mode textarea {
+            background-color: rgba(255, 255, 255, 0.96) !important;
+            border: 3px solid #22c55e !important;
+            box-shadow: none !important; /* NO BACKING SHADOWS */
+        }
+
+        body.day-mode header,
+        body.day-mode footer {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: #22c55e !important;
+            box-shadow: none !important;
+        }
+
+        /* Font Size Options */
+        .font-size-normal textarea { font-size: 1.25rem !important; line-height: 1.9rem !important; }
+        .font-size-big textarea { font-size: 1.65rem !important; line-height: 2.4rem !important; }
+        .font-size-xlarge textarea { font-size: 2.15rem !important; line-height: 3.0rem !important; }
+
+        .font-size-normal .stat-num { font-size: 2.25rem !important; }
+        .font-size-big .stat-num { font-size: 2.85rem !important; }
+        .font-size-xlarge .stat-num { font-size: 3.5rem !important; }
+
+        /* Custom Scrollbar */
+        textarea::-webkit-scrollbar {
+            width: 12px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: rgba(134, 239, 172, 0.15);
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #22c55e;
+            border-radius: 8px;
+        }
+
+        /* --------------------------------------------------------------
+           OFF-WHITE / LIGHT GREY BUTTONS WITH CRISP LIGHT GREEN TEXT
+           -------------------------------------------------------------- */
+        button {
+            background-color: #f8fafc !important;
+            border: 2px solid #cbd5e1 !important;
+            color: #16a34a !important;
+            text-shadow: none !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+
+        button:hover {
+            background-color: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+            color: #15803d !important;
+            transform: translateY(-1px);
+        }
+
+        button *, button i, button span {
+            color: #16a34a !important;
+            text-shadow: none !important;
+        }
+
+        /* Active indicator for font size selector buttons */
+        .btn-font-active {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d !important;
+        }
+
+        /* Voice TTS pulse indicator */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.98); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 0.8; }
+            100% { transform: scale(0.98); opacity: 1; }
+        }
+
+        .audio-playing {
+            animation: pulse-ring 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col justify-between font-size-normal relative">
+
+    <!-- Interactive Canvas Background (Zenith Sky View: Aurora/Milky Way in Night, Sun/Clouds in Day. NO MOUNTAINS) -->
+    <canvas id="sky-canvas" class="fixed inset-0 w-full h-full pointer-events-none -z-10"></canvas>
+
+    <!-- Main Wrapper -->
+    <div class="relative z-10 flex flex-col min-h-screen justify-between">
+
+    <!-- Top Navigation & Accessibility Header -->
+    <header class="w-full bg-slate-950/85 border-b-2 border-emerald-500/50 backdrop-blur-md transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Site Branding & Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400/80 flex items-center justify-center shrink-0">
+                    <i data-lucide="feather" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
+                        <span>Kid & Elder Count</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full border border-emerald-400/80 font-bold bg-emerald-500/20">全齡無障礙</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm font-bold opacity-90">小朋友至老人都能懂的字數統計與文章分析工具</p>
+                </div>
+            </div>
+
+            <!-- Toolbar Controls -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                
+                <!-- ☀️ DAYTIME / NIGHT MODE TOGGLE BUTTON -->
+                <button onclick="toggleHighContrast()" id="btn-high-contrast" class="flex items-center gap-2 px-4 py-2.5 rounded-2xl border-2 border-emerald-500/80 font-black text-xs sm:text-sm bg-emerald-950/60 hover:bg-emerald-900/80 transition transform active:scale-95 cursor-pointer">
+                    <i data-lucide="sun" class="w-4 h-4" id="contrast-icon"></i>
+                    <span id="contrast-text">☀️ 白天高對比模式</span>
+                </button>
+
+                <!-- Font Size Selector -->
+                <div class="flex items-center p-1 rounded-2xl border-2 border-emerald-500/60 bg-emerald-950/40">
+                    <span class="text-xs font-bold px-2 flex items-center gap-1">
+                        <i data-lucide="type" class="w-3.5 h-3.5"></i> 字體:
+                    </span>
+                    <button onclick="changeFontSize('normal')" id="btn-font-normal" class="px-3 py-1 rounded-xl text-xs font-black bg-emerald-500/40 border border-emerald-400">標準</button>
+                    <button onclick="changeFontSize('big')" id="btn-font-big" class="px-3 py-1 rounded-xl text-xs font-black opacity-80 hover:opacity-100">大 A+</button>
+                    <button onclick="changeFontSize('xlarge')" id="btn-font-xlarge" class="px-3 py-1 rounded-xl text-xs font-black opacity-80 hover:opacity-100">特大 A++</button>
+                </div>
+
+                <!-- Speech Voice TTS -->
+                <button onclick="toggleSpeech()" id="btn-speech" class="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border-2 border-emerald-500/80 font-bold text-xs sm:text-sm bg-emerald-950/60 hover:bg-emerald-900/80 transition cursor-pointer">
+                    <i data-lucide="volume-2" class="w-4 h-4" id="speech-icon"></i>
+                    <span id="speech-text">語音朗讀</span>
+                </button>
+
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-6">
+
+        <!-- 🌟 PROMINENT TOP TYPING AREA 🌟 -->
+        <section class="nz-card rounded-3xl p-5 sm:p-7 flex flex-col gap-4 border-4">
+            
+            <!-- Editor Header & Utility Buttons -->
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-emerald-500/40 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="p-2.5 rounded-2xl border border-emerald-400/50 bg-emerald-500/20">
+                        <i data-lucide="edit-3" class="w-6 h-6"></i>
+                    </span>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black flex items-center gap-2">
+                            ✏️ 請在這裡打字或貼上文章
+                        </h2>
+                        <p class="text-xs sm:text-sm font-bold opacity-90">點擊下方框框開始輸入，字數與統計數據會即時自動計算！</p>
+                    </div>
+                </div>
+
+                <!-- Sample & Clear Buttons -->
+                <div class="flex items-center gap-2">
+                    <button onclick="loadSampleText()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-400/60 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-xs sm:text-sm transition cursor-pointer">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        載入紐西蘭範例文章
+                    </button>
+                    <button onclick="clearText()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-400/60 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-xs sm:text-sm transition cursor-pointer">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        一鍵清空
+                    </button>
+                </div>
+            </div>
+
+            <!-- PROMINENT BIG TEXTAREA WITH LIVE COUNT BADGE -->
+            <div class="relative w-full">
+                <textarea 
+                    id="text-input"
+                    rows="9"
+                    placeholder="請點擊這裡打字或貼上文章... (例如：今天天氣非常好，我和家人一起在紐西蘭公園散步！)"
+                    class="w-full rounded-2xl p-5 sm:p-6 font-sans resize-y font-bold focus:outline-none focus:ring-4 focus:ring-emerald-400/60 transition"
+                    oninput="analyzeText()"
+                ></textarea>
+
+                <!-- Floating Real-Time Word Counter -->
+                <div class="absolute bottom-4 right-4 bg-emerald-950/90 border-2 border-emerald-400/80 px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 pointer-events-none">
+                    <i data-lucide="feather" class="w-4 h-4"></i>
+                    <span>即時字數: <strong id="live-word-count" class="stat-num font-mono text-base sm:text-lg">0</strong></span>
+                </div>
+            </div>
+
+            <!-- Touch-Friendly Fast Controls -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
+                <button onclick="copyToClipboard()" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-emerald-400/80 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-sm sm:text-base transition active:scale-95 cursor-pointer">
+                    <i data-lucide="copy" class="w-5 h-5"></i>
+                    一鍵複製文章
+                </button>
+
+                <button onclick="toggleSpeech()" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-emerald-400/80 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-sm sm:text-base transition active:scale-95 cursor-pointer">
+                    <i data-lucide="volume-2" class="w-5 h-5"></i>
+                    語音朗讀文章
+                </button>
+
+                <button onclick="cleanupText('spaces')" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-emerald-400/80 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-sm sm:text-base transition cursor-pointer">
+                    <i data-lucide="space" class="w-5 h-5"></i>
+                    刪除多餘空格
+                </button>
+
+                <button onclick="cleanupText('halfwidth')" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-emerald-400/80 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-sm sm:text-base transition cursor-pointer">
+                    <i data-lucide="languages" class="w-5 h-5"></i>
+                    全半形轉換
+                </button>
+
+                <button onclick="clearText()" class="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-emerald-400/80 bg-emerald-500/20 hover:bg-emerald-500/30 font-bold text-sm sm:text-base transition cursor-pointer">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                    重新開始
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Big Key Statistics Display (4 Grid Cards) -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <!-- 1. Total Word Count -->
+            <div class="nz-card nz-card-hover rounded-3xl p-5 flex items-center gap-4">
+                <div class="p-3.5 rounded-2xl border border-emerald-400/50 bg-emerald-500/20 shrink-0">
+                    <i data-lucide="file-text" class="w-7 h-7 sm:w-9 sm:h-9"></i>
+                </div>
+                <div>
+                    <div class="text-xs sm:text-sm font-bold opacity-90">總字數 (Words)</div>
+                    <div class="stat-num font-black font-mono leading-none mt-1" id="top-stat-words">0</div>
+                </div>
+            </div>
+
+            <!-- 2. Chars (without space) -->
+            <div class="nz-card nz-card-hover rounded-3xl p-5 flex items-center gap-4">
+                <div class="p-3.5 rounded-2xl border border-emerald-400/50 bg-emerald-500/20 shrink-0">
+                    <i data-lucide="align-left" class="w-7 h-7 sm:w-9 sm:h-9"></i>
+                </div>
+                <div>
+                    <div class="text-xs sm:text-sm font-bold opacity-90">字元數 (不含空格)</div>
+                    <div class="stat-num font-black font-mono leading-none mt-1" id="top-stat-chars-nospace">0</div>
+                </div>
+            </div>
+
+            <!-- 3. Paragraph Count -->
+            <div class="nz-card nz-card-hover rounded-3xl p-5 flex items-center gap-4">
+                <div class="p-3.5 rounded-2xl border border-emerald-400/50 bg-emerald-500/20 shrink-0">
+                    <i data-lucide="pilcrow" class="w-7 h-7 sm:w-9 sm:h-9"></i>
+                </div>
+                <div>
+                    <div class="text-xs sm:text-sm font-bold opacity-90">文章段落數</div>
+                    <div class="stat-num font-black font-mono leading-none mt-1" id="top-stat-paragraphs">0</div>
+                </div>
+            </div>
+
+            <!-- 4. Estimated Read Time -->
+            <div class="nz-card nz-card-hover rounded-3xl p-5 flex items-center gap-4">
+                <div class="p-3.5 rounded-2xl border border-emerald-400/50 bg-emerald-500/20 shrink-0">
+                    <i data-lucide="book-open" class="w-7 h-7 sm:w-9 sm:h-9"></i>
+                </div>
+                <div>
+                    <div class="text-xs sm:text-sm font-bold opacity-90">預估閱讀時間</div>
+                    <div class="stat-num font-black font-mono leading-none mt-1" id="top-stat-readtime">0 分</div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Goal Tracker & Frequency Breakdown -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Writing Goal Tracker (7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                <div class="nz-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-full">
+                    <div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-3 rounded-2xl border border-emerald-400/50 bg-emerald-500/20">
+                                    <i data-lucide="target" class="w-7 h-7"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg sm:text-xl">🎯 寫作目標進度條</h3>
+                                    <p class="text-xs sm:text-sm font-bold opacity-90">設定目標字數，完成 100% 時會有慶祝煙火喔！</p>
+                                </div>
+                            </div>
+
+                            <!-- Target Input -->
+                            <div class="flex items-center gap-2 p-2 rounded-2xl border-2 border-emerald-400/60 bg-emerald-950/30">
+                                <span class="text-xs font-bold opacity-90">目標:</span>
+                                <input type="number" id="target-input" value="300" min="10" step="50" onchange="analyzeText()" class="w-20 text-center font-black text-lg bg-emerald-950/80 border border-emerald-400/60 rounded-xl py-1 focus:outline-none">
+                                <span class="text-xs font-bold opacity-90">字</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="space-y-2 mt-4">
+                            <div class="flex justify-between items-center text-sm font-bold">
+                                <span class="font-mono text-base" id="target-percent-text">0% 已完成</span>
+                                <span class="font-mono opacity-90" id="target-ratio-text">0 / 300 字</span>
+                            </div>
+                            <div class="w-full h-5 bg-emerald-950/60 rounded-full overflow-hidden p-1 border-2 border-emerald-400/50">
+                                <div id="target-progress-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-300 w-0"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="target-status-msg" class="mt-4 text-xs sm:text-sm font-bold flex items-center gap-2 p-3 rounded-xl border border-emerald-400/40 bg-emerald-950/30">
+                        <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+                        <span>隨時在打字區輸入，進度條就會即時前進！</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Frequent Words Breakdown (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <div class="nz-card rounded-3xl p-6">
+                    <h3 class="text-lg font-bold border-b-2 border-emerald-400/40 pb-3 mb-4 flex items-center gap-2">
+                        <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                        熱門出現詞彙 (Top 5)
+                    </h3>
+
+                    <div id="freq-container" class="space-y-3">
+                        <p class="text-xs sm:text-sm opacity-85 italic py-3 text-center">請在打字區輸入內容，系統將自動統計出現頻率最高的單詞...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Comprehensive Detailed Breakdown -->
+        <section class="nz-card rounded-3xl p-6">
+            <h3 class="text-lg sm:text-xl font-bold border-b-2 border-emerald-400/40 pb-3 mb-5 flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                全方位詳細統計分析
+            </h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                
+                <div class="p-4 rounded-2xl border border-emerald-400/40 bg-emerald-950/20 flex flex-col justify-between">
+                    <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                        <i data-lucide="type" class="w-4 h-4"></i> 總字元 (含空格)
+                    </span>
+                    <span class="text-2xl font-black font-mono stat-num mt-2" id="stat-chars-space">0</span>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-emerald-400/40 bg-emerald-950/20 flex flex-col justify-between">
+                    <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                        <i data-lucide="space" class="w-4 h-4"></i> 總字元 (不含空格)
+                    </span>
+                    <span class="text-2xl font-black font-mono stat-num mt-2" id="stat-chars-nospace">0</span>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-emerald-400/40 bg-emerald-950/20 flex flex-col justify-between">
+                    <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                        <i data-lucide="languages" class="w-4 h-4"></i> 中文字數 (漢字)
+                    </span>
+                    <span class="text-2xl font-black font-mono stat-num mt-2" id="stat-zh-chars">0</span>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-emerald-400/40 bg-emerald-950/20 flex flex-col justify-between">
+                    <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                        <i data-lucide="baseline" class="w-4 h-4"></i> 英文單字數
+                    </span>
+                    <span class="text-2xl font-black font-mono stat-num mt-2" id="stat-en-words">0</span>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-emerald-400/40 bg-emerald-950/20 flex flex-col justify-between">
+                    <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                        <i data-lucide="pilcrow" class="w-4 h-4"></i> 文章段落數
+                    </span>
+                    <span class="text-2xl font-black font-mono stat-num mt-2" id="stat-paragraphs">0</span>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-emerald-400/40 bg-emerald-950/20 flex flex-col justify-between">
+                    <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                        <i data-lucide="text-quote" class="w-4 h-4"></i> 總句子數
+                    </span>
+                    <span class="text-2xl font-black font-mono stat-num mt-2" id="stat-sentences">0</span>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t-2 border-emerald-500/40 bg-slate-950/90 py-5 mt-10 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm font-bold flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-md"></span>
+                <span>Kid & Elder Count</span>
+                <span class="opacity-90">— 小朋友至老人都能懂的全齡無障礙字數統計工具</span>
+            </div>
+            <div class="text-xs font-bold opacity-90">
+                🇳🇿 100% 統一極致淺綠字體 | 白天半透明白底無陰影 • 夜晚深色質感暗影
+            </div>
+        </div>
+    </footer>
+
+    </div> <!-- End Main Overlay -->
+
+    <!-- Toast Popup Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 border-2 border-emerald-400 px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 text-sm sm:text-base font-black bg-slate-950/95 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+        <span id="toast-message">提示訊息</span>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // App State
+        let isDayMode = false; // False = Night Sky, True = Day Sky (White transparent cards, NO shadows)
+        let isSpeaking = false;
+        let synth = window.speechSynthesis;
+        let speechUtterance = null;
+        let goalReachedFired = false;
+
+        const sampleText = `紐西蘭（Aotearoa）是一個擁有一切自然美景的淨土。這裡有極清澈的普卡基湖（Lake Pukaki）、翠綠的銀蕨森林，以及夜空中極為絢麗的南方極光與銀河。
+
+無論是小朋友寫故事，或是爺爺奶奶記錄回憶，這個統計工具都能讓大家輕鬆讀懂每一個數字！寫作是一件快樂的事，隨時記錄生活中的點點滴滴吧！`;
+
+        /* -------------------------------------------------------------
+           Canvas Zenith Sky Engine (Aurora/Milky Way or Sun/Clouds, NO MOUNTAINS)
+        ---------------------------------------------------------------- */
+        function initSkyCanvas() {
+            const canvas = document.getElementById('sky-canvas');
+            const ctx = canvas.getContext('2d');
+
+            let width, height;
+            let stars = [];
+            let milkyWayStars = [];
+            let clouds = [];
+            let auroraPhase = 0;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                generateStars();
+                generateMilkyWayStars();
+                generateClouds();
+            }
+
+            function generateStars() {
+                stars = [];
+                const count = Math.floor((width * height) / 1600);
+                for (let i = 0; i < count; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 1.6 + 0.4,
+                        alpha: Math.random() * 0.85 + 0.15,
+                        speed: Math.random() * 0.02 + 0.005
+                    });
+                }
+            }
+
+            function generateMilkyWayStars() {
+                milkyWayStars = [];
+                for (let i = 0; i < 400; i++) {
+                    milkyWayStars.push({
+                        relX: Math.random(),
+                        offsetY: (Math.random() - 0.5) * 180,
+                        size: Math.random() * 2.0 + 0.5,
+                        alpha: Math.random() * 0.9 + 0.1
+                    });
+                }
+            }
+
+            function generateClouds() {
+                clouds = [];
+                for (let i = 0; i < 6; i++) {
+                    clouds.push({
+                        x: Math.random() * width,
+                        y: Math.random() * (height * 0.4),
+                        scale: Math.random() * 0.8 + 0.7,
+                        speed: Math.random() * 0.3 + 0.15
+                    });
+                }
+            }
+
+            function drawNightBackground() {
+                const cx = width / 2;
+                const cy = height * 0.4;
+                const radius = Math.max(width, height);
+                const bgGrad = ctx.createRadialGradient(cx, cy, 30, cx, cy, radius);
+                bgGrad.addColorStop(0, '#0a192f');
+                bgGrad.addColorStop(0.5, '#040b18');
+                bgGrad.addColorStop(1, '#02050b');
+
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            function drawDayBackground() {
+                const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+                bgGrad.addColorStop(0, '#0284c7');
+                bgGrad.addColorStop(0.5, '#38bdf8');
+                bgGrad.addColorStop(0.85, '#7dd3fc');
+                bgGrad.addColorStop(1, '#bae6fd');
+
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            function drawSun() {
+                ctx.save();
+                const sx = width * 0.85;
+                const sy = height * 0.15;
+                const r = 40;
+
+                const glow = ctx.createRadialGradient(sx, sy, r * 0.5, sx, sy, r * 5);
+                glow.addColorStop(0, 'rgba(255, 251, 200, 0.95)');
+                glow.addColorStop(0.4, 'rgba(253, 224, 71, 0.35)');
+                glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(sx, sy, r * 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#FEF08A';
+                ctx.beginPath();
+                ctx.arc(sx, sy, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function drawDayClouds() {
+                ctx.save();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+
+                clouds.forEach(c => {
+                    c.x += c.speed;
+                    if (c.x - 150 > width) c.x = -150;
+
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 36 * c.scale, 0, Math.PI * 2);
+                    ctx.arc(c.x + 30 * c.scale, c.y - 15 * c.scale, 42 * c.scale, 0, Math.PI * 2);
+                    ctx.arc(c.x + 70 * c.scale, c.y, 36 * c.scale, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.restore();
+            }
+
+            function drawMilkyWay() {
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.translate(width * 0.5, height * 0.4);
+                ctx.rotate(-Math.PI / 5);
+
+                const mwGrad = ctx.createRadialGradient(0, 0, 40, 0, 0, Math.max(width, height) * 0.55);
+                mwGrad.addColorStop(0, 'rgba(238, 242, 255, 0.4)');
+                mwGrad.addColorStop(0.3, 'rgba(192, 132, 252, 0.3)');
+                mwGrad.addColorStop(0.6, 'rgba(56, 189, 248, 0.2)');
+                mwGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                ctx.fillStyle = mwGrad;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, width * 0.8, height * 0.25, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                milkyWayStars.forEach(s => {
+                    const x = (s.relX - 0.5) * width * 1.2;
+                    const y = s.offsetY;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.restore();
+            }
+
+            function drawStars() {
+                ctx.save();
+                stars.forEach(star => {
+                    star.alpha += Math.sin(auroraPhase * star.speed * 10) * 0.01;
+                    const opacity = Math.max(0.15, Math.min(1, star.alpha));
+                    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+            }
+
+            function drawAurora() {
+                ctx.save();
+                ctx.globalCompositeOperation = 'screen';
+                auroraPhase += 0.006;
+
+                const layers = [
+                    { color1: 'rgba(0, 255, 153, 0.7)', color2: 'rgba(16, 185, 129, 0.4)', yBase: height * 0.28, amp: 65, freq: 0.003 },
+                    { color1: 'rgba(192, 132, 252, 0.6)', color2: 'rgba(147, 51, 234, 0.35)', yBase: height * 0.38, amp: 75, freq: 0.002 }
+                ];
+
+                layers.forEach((layer, idx) => {
+                    const grad = ctx.createLinearGradient(0, layer.yBase - 80, 0, layer.yBase + 260);
+                    grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                    grad.addColorStop(0.3, layer.color1);
+                    grad.addColorStop(0.7, layer.color2);
+                    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.moveTo(0, layer.yBase);
+
+                    for (let x = 0; x <= width + 30; x += 25) {
+                        const y = layer.yBase + 
+                                  Math.sin(x * layer.freq + auroraPhase + idx) * layer.amp + 
+                                  Math.cos(x * 0.0012 - auroraPhase * 0.7) * 30;
+                        ctx.lineTo(x, y);
+                    }
+
+                    ctx.lineTo(width, height);
+                    ctx.lineTo(0, height);
+                    ctx.closePath();
+                    ctx.fill();
+                });
+
+                ctx.restore();
+            }
+
+            function drawMoon() {
+                ctx.save();
+                const mx = width * 0.85;
+                const my = height * 0.15;
+                const r = 22;
+
+                const glow = ctx.createRadialGradient(mx, my, r * 0.8, mx, my, r * 5);
+                glow.addColorStop(0, 'rgba(255, 253, 235, 0.8)');
+                glow.addColorStop(0.4, 'rgba(235, 245, 255, 0.25)');
+                glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(mx, my, r * 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#F5F5EA';
+                ctx.beginPath();
+                ctx.arc(mx, my, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function drawTreetopCanopy(isDay) {
+                ctx.save();
+                ctx.fillStyle = isDay ? '#15803d' : '#01040a';
+
+                // Bottom Canopy
+                ctx.beginPath();
+                ctx.moveTo(0, height);
+                for (let x = 0; x <= width; x += 15) {
+                    const treeH = Math.sin(x * 0.035) * 22 + Math.cos(x * 0.08) * 16 + 50;
+                    ctx.lineTo(x, height - treeH);
+                }
+                ctx.lineTo(width, height);
+                ctx.closePath();
+                ctx.fill();
+
+                // Left Edge Canopy
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                for (let y = 0; y <= height; y += 20) {
+                    const branchW = Math.sin(y * 0.04) * 25 + 38;
+                    ctx.lineTo(branchW, y);
+                }
+                ctx.lineTo(0, height);
+                ctx.closePath();
+                ctx.fill();
+
+                // Right Edge Canopy
+                ctx.beginPath();
+                ctx.moveTo(width, 0);
+                for (let y = 0; y <= height; y += 20) {
+                    const branchW = Math.sin(y * 0.035) * 25 + 38;
+                    ctx.lineTo(width - branchW, y);
+                }
+                ctx.lineTo(width, height);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            function animateSky() {
+                ctx.clearRect(0, 0, width, height);
+                if (isDayMode) {
+                    drawDayBackground();
+                    drawSun();
+                    drawDayClouds();
+                    drawTreetopCanopy(true);
+                } else {
+                    drawNightBackground();
+                    drawMilkyWay();
+                    drawAurora();
+                    drawStars();
+                    drawMoon();
+                    drawTreetopCanopy(false);
+                }
+                requestAnimationFrame(animateSky);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            animateSky();
+        }
+
+        window.onload = function() {
+            initSkyCanvas();
+            analyzeText();
+            lucide.createIcons();
+        };
+
+        /* -------------------------------------------------------------
+           Toggle Day / Night Mode (Day Mode = White Semi-Transparent, NO Shadows)
+        ---------------------------------------------------------------- */
+        function toggleHighContrast() {
+            isDayMode = !isDayMode;
+            const btnText = document.getElementById('contrast-text');
+
+            if (isDayMode) {
+                document.body.classList.add('day-mode');
+                btnText.innerText = "🌌 切回極光夜空模式";
+                showToast("已切換為【☀️ 白天高對比模式】（純白半透明卡片，無陰影、無模糊）");
+            } else {
+                document.body.classList.remove('day-mode');
+                btnText.innerText = "☀️ 白天高對比模式";
+                showToast("已切回【🌌 紐西蘭極光夜空模式】");
+            }
+            analyzeText();
+        }
+
+        /* -------------------------------------------------------------
+           Font Size Adjustment
+        ---------------------------------------------------------------- */
+        function changeFontSize(size) {
+            document.body.classList.remove('font-size-normal', 'font-size-big', 'font-size-xlarge');
+            document.body.classList.add(`font-size-${size}`);
+
+            ['normal', 'big', 'xlarge'].forEach(s => {
+                const btn = document.getElementById(`btn-font-${s}`);
+                if (s === size) {
+                    btn.classList.add('btn-font-active');
+                } else {
+                    btn.classList.remove('btn-font-active');
+                }
+            });
+
+            showToast(`字體大小已設定為：${size === 'normal' ? '標準' : size === 'big' ? '大字 A+' : '特大 A++'}`);
+        }
+
+        /* -------------------------------------------------------------
+           Voice TTS Read Aloud
+        ---------------------------------------------------------------- */
+        function toggleSpeech() {
+            if (!('speechSynthesis' in window)) {
+                showToast("您的瀏覽器不支援語音朗讀。");
+                return;
+            }
+
+            const text = document.getElementById('text-input').value;
+            if (!text.trim()) {
+                showToast("請先在上面輸入框填寫文章喔！");
+                return;
+            }
+
+            if (isSpeaking) {
+                synth.cancel();
+                isSpeaking = false;
+                updateSpeechUI(false);
+                showToast("已停止語音朗讀");
+            } else {
+                synth.cancel();
+                speechUtterance = new SpeechSynthesisUtterance(text);
+                speechUtterance.lang = 'zh-TW';
+                speechUtterance.rate = 0.9;
+
+                speechUtterance.onend = () => { isSpeaking = false; updateSpeechUI(false); };
+                speechUtterance.onerror = () => { isSpeaking = false; updateSpeechUI(false); };
+
+                synth.speak(speechUtterance);
+                isSpeaking = true;
+                updateSpeechUI(true);
+                showToast("正在為您朗讀文章...");
+            }
+        }
+
+        function updateSpeechUI(active) {
+            const btn = document.getElementById('btn-speech');
+            const textSpan = document.getElementById('speech-text');
+            if (active) {
+                btn.classList.add('audio-playing');
+                textSpan.innerText = "停止朗讀";
+            } else {
+                btn.classList.remove('audio-playing');
+                textSpan.innerText = "語音朗讀";
+            }
+        }
+
+        /* -------------------------------------------------------------
+           Real-Time Text Analysis
+        ---------------------------------------------------------------- */
+        function analyzeText() {
+            const text = document.getElementById('text-input').value;
+
+            // 1. Chars
+            const totalCharsSpace = text.length;
+            const totalCharsNoSpace = text.replace(/\s/g, '').length;
+
+            // 2. Chinese Chars
+            const zhMatches = text.match(/[\u4e00-\u9fa5\u3400-\u4dbf]/g) || [];
+            const zhCount = zhMatches.length;
+
+            // 3. English Words
+            const enWordsMatches = text.match(/\b[a-zA-Z0-9]+(?:'[a-zA-Z0-9]+)?\b/g) || [];
+            const enWordsCount = enWordsMatches.length;
+
+            const combinedWords = zhCount + enWordsCount;
+
+            // Update live counter badge
+            document.getElementById('live-word-count').innerText = combinedWords.toLocaleString();
+
+            // 4. Paragraphs
+            const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0).length;
+
+            // 5. Sentences
+            const sentenceMatches = text.match(/[^.!?。！？]+[.!?。！？]+/g) || [];
+            let sentencesCount = sentenceMatches.length;
+            if (sentencesCount === 0 && text.trim().length > 0) sentencesCount = 1;
+
+            // Top Stat Cards
+            document.getElementById('top-stat-words').innerText = combinedWords.toLocaleString();
+            document.getElementById('top-stat-chars-nospace').innerText = totalCharsNoSpace.toLocaleString();
+            document.getElementById('top-stat-paragraphs').innerText = paragraphs.toLocaleString();
+
+            const readMinutes = Math.ceil(combinedWords / 200) || 0;
+            document.getElementById('top-stat-readtime').innerText = readMinutes === 0 && combinedWords > 0 ? "< 1 分" : `${readMinutes} 分`;
+
+            // Detailed Breakdown
+            document.getElementById('stat-chars-space').innerText = totalCharsSpace.toLocaleString();
+            document.getElementById('stat-chars-nospace').innerText = totalCharsNoSpace.toLocaleString();
+            document.getElementById('stat-zh-chars').innerText = zhCount.toLocaleString();
+            document.getElementById('stat-en-words').innerText = enWordsCount.toLocaleString();
+            document.getElementById('stat-paragraphs').innerText = paragraphs.toLocaleString();
+            document.getElementById('stat-sentences').innerText = sentencesCount.toLocaleString();
+
+            // Goal Progress
+            updateTargetTracker(combinedWords);
+
+            // Frequency
+            renderFrequencyAnalysis(zhMatches, enWordsMatches);
+        }
+
+        /* -------------------------------------------------------------
+           Goal Tracker
+        ---------------------------------------------------------------- */
+        function updateTargetTracker(currentWords) {
+            const targetInput = document.getElementById('target-input');
+            let goal = parseInt(targetInput.value) || 300;
+            if (goal <= 0) goal = 1;
+
+            const percentage = Math.min(Math.round((currentWords / goal) * 100), 100);
+
+            document.getElementById('target-percent-text').innerText = `${percentage}% 已完成`;
+            document.getElementById('target-ratio-text').innerText = `${currentWords} / ${goal} 字`;
+            document.getElementById('target-progress-bar').style.width = `${percentage}%`;
+
+            const statusMsg = document.getElementById('target-status-msg');
+
+            if (currentWords >= goal && currentWords > 0) {
+                statusMsg.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i> <span class="font-bold">🎉 恭喜！您已成功達到 ${goal} 字寫作目標！</span>`;
+                
+                if (!goalReachedFired) {
+                    triggerConfetti();
+                    goalReachedFired = true;
+                }
+            } else {
+                const diff = goal - currentWords;
+                statusMsg.innerHTML = `<i data-lucide="info" class="w-5 h-5 shrink-0"></i> <span>加油！還差 <b>${diff}</b> 個字就能達成設定目標囉！</span>`;
+                goalReachedFired = false;
+            }
+            lucide.createIcons();
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 90,
+                    origin: { y: 0.6 },
+                    colors: ['#4ADE80', '#86EFAC', '#16A34A', '#22C55E', '#15803D']
+                });
+            }
+        }
+
+        /* -------------------------------------------------------------
+           Word Frequency Analyzer (Top 5)
+        ---------------------------------------------------------------- */
+        function renderFrequencyAnalysis(zhArr, enArr) {
+            const freqMap = {};
+
+            zhArr.forEach(c => { freqMap[c] = (freqMap[c] || 0) + 1; });
+
+            const stopwords = new Set(['the','be','to','of','and','a','in','that','have','i','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','say','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','is','are','was','were']);
+            enArr.forEach(w => {
+                const lower = w.toLowerCase();
+                if (lower.length > 1 && !stopwords.has(lower)) {
+                    freqMap[lower] = (freqMap[lower] || 0) + 1;
+                }
+            });
+
+            const sorted = Object.entries(freqMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const container = document.getElementById('freq-container');
+
+            if (sorted.length === 0) {
+                container.innerHTML = `<p class="text-xs sm:text-sm opacity-85 italic py-3 text-center">請在打字區輸入內容，系統將自動統計出現頻率最高的單詞...</p>`;
+                return;
+            }
+
+            const maxVal = sorted[0][1];
+            container.innerHTML = sorted.map(([word, count]) => {
+                const pct = Math.round((count / maxVal) * 100);
+                return `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs sm:text-sm font-bold">
+                            <span class="font-mono text-base">${word}</span>
+                            <span class="stat-num text-sm">${count} 次</span>
+                        </div>
+                        <div class="w-full h-3 bg-emerald-950/40 rounded-full overflow-hidden p-0.5 border border-emerald-400/30">
+                            <div class="h-full bg-emerald-400 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /* -------------------------------------------------------------
+           Fast Actions
+        ---------------------------------------------------------------- */
+        function loadSampleText() {
+            document.getElementById('text-input').value = sampleText;
+            analyzeText();
+            showToast("已載入紐西蘭特色範例文章！");
+        }
+
+        function clearText() {
+            document.getElementById('text-input').value = '';
+            analyzeText();
+            if (isSpeaking) {
+                synth.cancel();
+                isSpeaking = false;
+                updateSpeechUI(false);
+            }
+            showToast("內容已清空");
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('text-input').value;
+            if (!text) {
+                showToast("尚未輸入任何文字喔！");
+                return;
+            }
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            showToast("已成功將文章複製到剪貼簿！");
+        }
+
+        function cleanupText(type) {
+            const input = document.getElementById('text-input');
+            let text = input.value;
+            if (!text) return;
+
+            if (type === 'spaces') {
+                input.value = text.split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim()).join('\n');
+                showToast("已清理多餘空格！");
+            } else if (type === 'halfwidth') {
+                input.value = text.replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0))
+                                  .replace(/\u3000/g, ' ');
+                showToast("全形符號已轉換為半形！");
+            }
+
+            analyzeText();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
